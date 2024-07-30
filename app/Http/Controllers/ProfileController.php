@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Chirp;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,5 +58,29 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Display the user's profile.
+     */
+    public function show(User $user): View
+    {   
+        return view('profile.show', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Store follow the user.
+     */
+    public function storeFollow(User $user): RedirectResponse
+    {
+        if($user->followers->contains(request()->user()->id)){
+            $user->followers()->detach(request()->user()->id);
+        } else {
+            $user->followers()->attach(request()->user()->id);
+        }       
+
+        return Redirect::back();
     }
 }
